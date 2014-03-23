@@ -5,17 +5,17 @@ public class Building {
 	private Elevator elevator;
 	private EventBarrier barrier;
 	
-	public Building(int f){
+	public Building(int f, int max){
 		numFloors = f;
-		elevator = new Elevator();
+		elevator = new Elevator(max);
 		barrier = new EventBarrier();
 	}
 	
-	public Elevator callUp(int from){
+	public Elevator callUp(Rider r){
 		return elevator;
 	}
 	
-	public Elevator callDown(int from){
+	public Elevator callDown(Rider r){
 		return elevator;
 	}
 

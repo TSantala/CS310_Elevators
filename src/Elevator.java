@@ -6,10 +6,12 @@ public class Elevator {
 	private PriorityQueue<Integer> floorList;
 	private int currentFloor;
 	private boolean isGoingUp = false;
+	private int maxCapacity;
 	
-	public Elevator(){
+	public Elevator(int max){
 		barrier = new EventBarrier();
 		floorList = new PriorityQueue<Integer>();
+		maxCapacity = max;
 	}
 	
 	public synchronized void Enter(){
@@ -20,7 +22,7 @@ public class Elevator {
 		
 	}
 	
-	public void RequestFloor(){
+	public void RequestFloor(int floor){
 		
 	}
 	

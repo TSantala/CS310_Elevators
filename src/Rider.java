@@ -16,7 +16,7 @@ public class Rider extends Thread{
 	@Override
 	public synchronized void run(){
 		System.out.println("Running: id = "+id);
-		Elevator e = (to > from) ? building.callUp(from) : building.callDown(from);
+		Elevator e = (to > from) ? building.callUp(this) : building.callDown(this);
 		System.out.println("Elevator has been assigned to this rider! = "+id);
 		
 		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
@@ -26,7 +26,10 @@ public class Rider extends Thread{
 				e1.printStackTrace();
 			}
 		}
+		e.suspend();
 		e.Enter();
+		e.RequestFloor(to);
+		e.resume();
 		while(e.getFloor() != to){
 			try {
 				this.wait();
