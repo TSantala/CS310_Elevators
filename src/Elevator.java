@@ -1,28 +1,31 @@
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.PriorityQueue;
 
 public class Elevator {
 	
 	private EventBarrier barrier;
-	private List<Integer> floorList;
+	private PriorityQueue<Integer> floorList;
 	private int currentFloor;
+	private boolean isGoingUp = false;
 	
 	public Elevator(){
 		barrier = new EventBarrier();
-		floorList = new ArrayList<Integer>();
+		floorList = new PriorityQueue<Integer>();
 	}
 	
-	public void Enter(){
+	public synchronized void Enter(){
 		
 	}
 	
-	public void Exit(){
+	public synchronized void Exit(){
 		
 	}
 	
 	public void RequestFloor(){
 		
+	}
+	
+	public boolean isGoingUp(){
+		return isGoingUp;
 	}
 	
 	public synchronized int getFloor(){

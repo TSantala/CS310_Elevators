@@ -11,11 +11,11 @@ public class Building {
 		barrier = new EventBarrier();
 	}
 	
-	public Elevator callUp(){
+	public Elevator callUp(int from){
 		return elevator;
 	}
 	
-	public Elevator callDown(){
+	public Elevator callDown(int from){
 		return elevator;
 	}
 
