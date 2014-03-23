@@ -9,6 +9,7 @@ public class Consumer extends Thread {
 		id = i;
 	}
 	
+	@Override
 	public synchronized void run(){
 		System.out.println("Running: id = "+id);
 		barrier.arrive();
