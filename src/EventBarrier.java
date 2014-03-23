@@ -24,12 +24,26 @@ public class EventBarrier extends AbstractEventBarrier {
 	@Override
 	public synchronized void raise() {
 		gateOpen = true;
+<<<<<<< HEAD
 		System.out.println("Gate has opened!");
 		this.notifyAll();		
 		
 		
 		
 		
+=======
+		System.out.println("*** Gate has opened!");
+		this.notifyAll();
+		while(true){
+			if(numWaiting > 0) {
+				
+			}
+			else {
+				gateOpen = true;
+				break;
+			}
+		}
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 	}
 
 	
@@ -39,6 +53,10 @@ public class EventBarrier extends AbstractEventBarrier {
 		System.out.println("Complete called: numWaiting = "+numWaiting);
 		if(numWaiting==0){
 			gateOpen = false;
+<<<<<<< HEAD
+=======
+			System.out.println("*** Gate closed");
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 		}
 	}
 

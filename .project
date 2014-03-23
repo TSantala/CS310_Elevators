@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
+<<<<<<< HEAD
 	<name>Elevators</name>
+=======
+	<name>CS310_Elevators_test</name>
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 	<comment></comment>
 	<projects>
 	</projects>

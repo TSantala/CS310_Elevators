@@ -16,10 +16,17 @@ public class Rider extends Thread{
 	@Override
 	public synchronized void run(){
 		System.out.println("Running: id = "+id);
+<<<<<<< HEAD
 		Elevator e = (to > from) ? building.callUp() : building.callDown();
 		System.out.println("Elevator has been assigned to this rider! = "+id);
 		
 		while(e.getFloor() != to){
+=======
+		Elevator e = (to > from) ? building.callUp(from) : building.callDown(from);
+		System.out.println("Elevator has been assigned to this rider! = "+id);
+		
+		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 			try {
 				this.wait();
 			} catch (InterruptedException e1) {
@@ -27,6 +34,25 @@ public class Rider extends Thread{
 			}
 		}
 		e.Enter();
+<<<<<<< HEAD
+=======
+		while(e.getFloor() != to){
+			try {
+				this.wait();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		}
+		e.Exit();
+	}
+	
+	public int getFrom(){
+		return from;
+	}
+	
+	public int getTo(){
+		return to;
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 	}
 
 }

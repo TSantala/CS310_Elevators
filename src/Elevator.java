@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,11 +101,41 @@ public class Elevator extends Thread{
 
 	
 
+=======
+import java.util.PriorityQueue;
+
+public class Elevator {
+	
+	private EventBarrier barrier;
+	private PriorityQueue<Integer> floorList;
+	private int currentFloor;
+	private boolean isGoingUp = false;
+	
+	public Elevator(){
+		barrier = new EventBarrier();
+		floorList = new PriorityQueue<Integer>();
+	}
+	
+	public synchronized void Enter(){
+		
+	}
+	
+	public synchronized void Exit(){
+		
+	}
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 	
 	public void RequestFloor(){
 		
 	}
 	
+<<<<<<< HEAD
+=======
+	public boolean isGoingUp(){
+		return isGoingUp;
+	}
+	
+>>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 	public synchronized int getFloor(){
 		return currentFloor;
 	}
