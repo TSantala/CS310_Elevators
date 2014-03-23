@@ -25,7 +25,16 @@ public class EventBarrier extends AbstractEventBarrier {
 	public synchronized void raise() {
 		gateOpen = true;
 		System.out.println("*** Gate has opened!");
-		this.notifyAll();		
+		this.notifyAll();
+		while(true){
+			if(numWaiting > 0) {
+				
+			}
+			else {
+				gateOpen = true;
+				break;
+			}
+		}
 	}
 
 	
