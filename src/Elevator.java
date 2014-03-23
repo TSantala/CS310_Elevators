@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +16,6 @@ public class Elevator extends Thread{
 	private boolean goingUp;
 	private int ridersOn;
 	
-	
-
 	
 	/**
 	 * Other variables/data structures as needed goes here 
@@ -49,7 +46,7 @@ public class Elevator extends Thread{
 	
 	public void addRequest(Rider newRider) {
 		riderList.add(newRider);
-		int floor = newRider.getFrom()
+		int floor = newRider.getFrom();
 		int numRidersOn = numOn.get(floor);
 		numOn.set(floor, numRidersOn++);
 		if(!floorList.contains(floor)) {

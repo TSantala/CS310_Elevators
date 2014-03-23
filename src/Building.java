@@ -7,23 +7,16 @@ public class Building {
 	
 	public Building(int f){
 		numFloors = f;
-		elevator = new Elevator();
+		elevator = new Elevator(0,0,0);
 		barrier = new EventBarrier();
 	}
 	
-<<<<<<< HEAD
-	public Elevator callUp(){
+
+	public Elevator callUp(Rider r){
 		return elevator;
 	}
 	
-	public Elevator callDown(){
-=======
-	public Elevator callUp(int from){
-		return elevator;
-	}
-	
-	public Elevator callDown(int from){
->>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
+	public Elevator callDown(Rider r){
 		return elevator;
 	}
 

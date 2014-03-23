@@ -9,14 +9,11 @@ public class Consumer extends Thread {
 		id = i;
 	}
 	
-<<<<<<< HEAD
-=======
 	@Override
->>>>>>> af44cbe5c038e4b1b4ef5c05fa3029362fea40c9
 	public synchronized void run(){
 		System.out.println("Running: id = "+id);
 		barrier.arrive();
-		System.out.println("After arrive, before complete: Consumer ln 12, id = "+id);
+		System.out.println("After arrive, before complete: id = "+id);
 		barrier.complete();		
 	}
 

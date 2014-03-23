@@ -8,6 +8,10 @@ public class Tester {
 	private void runTestPart1() {
 		EventBarrier barrier = new EventBarrier();
 		
+		barrier.raise();
+		
+		this.pause(100);
+		
 		Consumer c0 = new Consumer(barrier,0);
 		c0.start();
 		
