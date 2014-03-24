@@ -16,7 +16,7 @@ public class Main {
 		File logfile = new File("logfile.txt");
 		if (!logfile.exists()) 
 			logfile.createNewFile();
-		
+
 		FileWriter fw = new FileWriter(logfile.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 
@@ -52,8 +52,10 @@ public class Main {
 				from = Integer.parseInt(params[1]);
 				to = Integer.parseInt(params[2]);
 
-				b.riderInput(rider, from, to);
+				b.riderRequestInput(rider, from, to);
 			}
+			
+			b.startRiders();
 
 		}
 		catch(FileNotFoundException e) {
@@ -64,6 +66,7 @@ public class Main {
 		}
 
 		System.out.println("Simulation complete!\n");
+
 		bw.write("Simulation Complete");
 		bw.close();
 	}

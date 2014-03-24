@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.*;
+
 public class Rider extends Thread{
 	
 	private Building building;
@@ -6,6 +8,7 @@ public class Rider extends Thread{
 	private int to;
 	private int id;
 	private BufferedWriter logfile;
+	private Queue<Request> myRequests = new LinkedList<Request>();
 	
 	public Rider(int floorFrom, int floorTo, Building b, int i, BufferedWriter log){
 		building = b;
@@ -28,10 +31,11 @@ public class Rider extends Thread{
 	
 	@Override
 	public synchronized void run(){
+		
 		System.out.println("Running: id = "+id);
 
 		Elevator e = (to > from) ? building.callUp(this) : building.callDown(this);
-		System.out.println("Elevator has been assigned to this rider! = "+id);
+		System.out.println("Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
 		
 		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
 			this.safeWait();
@@ -43,7 +47,23 @@ public class Rider extends Thread{
 		while(e.getFloor() != to){
 			this.safeWait();
 		}
+		
 		e.Exit();
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
+		if(!myRequests.isEmpty()){
+			Request next = myRequests.remove();
+			this.setStartDest(next.getFrom(),next.getTo());
+			this.run();
+		}
+		
+		System.out.println("Rider "+id+" has finished!");
+
 	}
 	
 	public int getFrom(){
@@ -52,6 +72,10 @@ public class Rider extends Thread{
 	
 	public int getTo(){
 		return to;
+	}	
+
+	public void addRequest(Request r) {
+		myRequests.add(r);
 	}
 	
 	public void writeLog(String message) throws IOException {

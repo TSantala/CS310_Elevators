@@ -192,7 +192,11 @@ public class Elevator extends Thread{
 	public synchronized int getFloor(){
 		return currentFloor;
 	}
-	
+
+	public synchronized int getID(){
+		return elevatorId;
+	}
+
 	public synchronized boolean isInTransit() {
 		return inTransit;
 	}

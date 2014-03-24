@@ -1,7 +1,8 @@
 import java.io.*;
+import java.util.*;
 
 public class Building {
-	
+
 	private int numFloors;
 	private Rider[] riders;
 	private Elevator[] elevators;
@@ -11,8 +12,10 @@ public class Building {
 	private int numElevators;
 	private int capacity;
 	private BufferedWriter logfile;
-	
-	
+
+	private List<Request> requests = new ArrayList<Request>();
+
+
 	public Building(int f, int e, int r, int n, BufferedWriter log){
 		numFloors = f;
 		numElevators = e;
@@ -22,12 +25,14 @@ public class Building {
 
 		//barrier = new EventBarrier();
 	}
-	
+
 	public void init() throws IOException {
 		Elevator e;
 		Rider r;
+		
 		elevators = new Elevator[numElevators];
-		System.out.println("Elevator array initialized\n");
+		System.out.println("Elevator array initialized");
+
 		for(int i = 0; i < numElevators; i++) {
 			System.out.println("preerror" + numElevators + "\n");
 			e = new Elevator(numFloors,i+1,capacity, logfile);
@@ -37,22 +42,25 @@ public class Building {
 			elevators[i] = e;
 		}
 		System.out.println("Created elevators!");
+
 		riders = new Rider[numRiders];
 		for(int j = 0; j < numRiders; j++) {
 			r = new Rider(this, j+1, logfile); 
 			riders[j] = r;
 		}
-		System.out.println("Finished building initialization!");
+		System.out.println("Created riders!");
+	}
+
+	public void riderRequestInput(int riderNum, int start, int dest) {
+		Request r = new Request(riderNum, start, dest);
+		requests.add(r);
+		riders[riderNum-1].addRequest(r);
 	}
 	
-	public void riderInput(int riderNum, int start, int dest) {
-		//if(start position / request not already set)
-		Rider r = riders[riderNum-1];
-		r.setStartDest(start, dest);
-		r.start(); //the function here is going to change. needs to start running and then wait for movement commands issued by the building
-		//else store request for future.
+	public void startRiders(){
+		for(Rider r : riders)
+			r.start();
 	}
-	
 
 	public Elevator callUp(Rider r){
 		int startFloor = r.getFrom();
@@ -68,7 +76,7 @@ public class Building {
 			}
 		}
 	}
-	
+
 	public Elevator callDown(Rider r){
 		int startFloor = r.getFrom();
 		while(true) {
@@ -83,7 +91,7 @@ public class Building {
 			}
 		}
 	}
-	
+
 	public void writeLog(String message) throws IOException {
 		synchronized(logfile) {
 			logfile.write(message);
