@@ -42,9 +42,8 @@ public class Main {
 			elevators = Integer.parseInt(params[1]);
 			riders = Integer.parseInt(params[2]);
 			capacity = Integer.parseInt(params[3]);
-			System.out.println("Starting building initialization!" + floors + " " + elevators + " " + riders + " " + capacity);
+			System.out.println("Starting building initialization! " + floors + " " + elevators + " " + riders + " " + capacity);
 			b = new Building(floors, elevators, riders, capacity, bw);
-			System.out.println("Starting building initialization!");
 			b.init();
 
 			while((line = bufferedReader.readLine()) != null) {
@@ -67,7 +66,7 @@ public class Main {
 		}
 
 		// Going to want to move this to building, once we actually know we're done.
-		System.out.println("Simulation complete!\n");
+		//System.out.println("Simulation complete!\n");
 
 		bw.write("Simulation Complete");
 		bw.close();

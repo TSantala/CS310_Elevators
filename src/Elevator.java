@@ -219,7 +219,7 @@ public class Elevator extends Thread{
 	}
 
 	public void writeLog(String message) {
-		System.out.println(message);
+		System.out.print(message);
 		synchronized(logfile) {
 			try {
 				logfile.write(message);

@@ -31,6 +31,11 @@ public class Rider extends Thread{
 
 	@Override
 	public synchronized void run(){
+		
+		if(myRequests.isEmpty()) return;
+		
+		Request next = myRequests.remove();
+		this.setStartDest(next.getFrom(),next.getTo());
 
 		System.out.println("Running: id = "+id);
 
@@ -43,6 +48,7 @@ public class Rider extends Thread{
 			this.writeLog("R"+id+" pushes "+"D"+from+"\n");
 			e = building.callDown(this);
 		}
+		
 		System.out.println("Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
 
 		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
@@ -72,8 +78,6 @@ public class Rider extends Thread{
 		}
 
 		if(!myRequests.isEmpty()){
-			Request next = myRequests.remove();
-			this.setStartDest(next.getFrom(),next.getTo());
 			this.run();
 		}
 
@@ -94,7 +98,7 @@ public class Rider extends Thread{
 	}
 
 	public void writeLog(String message) {
-		System.out.println(message);
+		System.out.print(message);
 		synchronized(logfile) {
 			try {
 				logfile.write(message);
