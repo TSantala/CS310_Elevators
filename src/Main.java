@@ -42,6 +42,7 @@ public class Main {
 			elevators = Integer.parseInt(params[1]);
 			riders = Integer.parseInt(params[2]);
 			capacity = Integer.parseInt(params[3]);
+			System.out.println("Starting building initialization!" + floors + " " + elevators + " " + riders + " " + capacity);
 			b = new Building(floors, elevators, riders, capacity, bw);
 			System.out.println("Starting building initialization!");
 			b.init();
@@ -51,7 +52,7 @@ public class Main {
 				rider = Integer.parseInt(params[0]);
 				from = Integer.parseInt(params[1]);
 				to = Integer.parseInt(params[2]);
-
+				System.out.println(rider + " " + from + " " + to);
 				b.riderRequestInput(rider, from, to);
 			}
 			
