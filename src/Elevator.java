@@ -127,21 +127,24 @@ public class Elevator extends Thread{
 	/* Go to a requested floor */
 	public synchronized void VisitFloor(int floor) {
 		String direction;
+		int printfloor = currentFloor;
 		if(floor>currentFloor){
 			goingUp = true;
 			direction = "up";
+			while(printfloor<=floor){
+				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor);
+				printfloor++;
+			}
 		}
 		else {
 			goingUp = false;
 			direction = "down";
+			while(printfloor>=floor){
+				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor);
+				printfloor--;
+			}
 		}
 		
-		System.out.println("Now visiting floor: "+currentFloor);
-		int printfloor = currentFloor;
-		while(printfloor<=floor){
-			writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor);
-			printfloor++;
-		}
 		currentFloor = floor;
 		this.OpenDoors();
 	}
