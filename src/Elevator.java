@@ -6,14 +6,13 @@ import java.io.*;
 
 public class Elevator extends Thread{
 
-	protected int numFloors; 
-	protected int elevatorId;
-	protected int maxOccupancyThreshold;
+	//private int numFloors; 
+	private int elevatorId;
+	private int maxOccupancyThreshold;
 	//private EventBarrier barrier;
-	private List<Rider> riderList;
 	private List<Integer> floorList;
-	private List<Integer> numOn;
-	private List<Integer> numOff;
+	private List<Integer> numGettingOn;
+	private List<Integer> numGettingOff;
 	private int currentFloor;
 	private boolean goingUp;
 	private int ridersOn;
@@ -22,24 +21,23 @@ public class Elevator extends Thread{
 
 
 	public Elevator(int numFloors, int elevatorId, int maxOccupancyThreshold, BufferedWriter log) {
-		this.numFloors = numFloors;
+		//this.numFloors = numFloors;
 		this.elevatorId = elevatorId;
 		this.maxOccupancyThreshold = maxOccupancyThreshold;
-		this.riderList = new ArrayList<Rider>();
 		this.floorList = new ArrayList<Integer>();
 		logfile = log;
-		this.numOn = new ArrayList<Integer>();
-		this.numOff = new ArrayList<Integer>();
+		this.numGettingOn = new ArrayList<Integer>();
+		this.numGettingOff = new ArrayList<Integer>();
 		for(int i = 0; i <= numFloors+1; i++){
-			numOn.add(0);
-			numOff.add(0);
+			numGettingOn.add(0);
+			numGettingOff.add(0);
 		}
 		inTransit = false;
 		currentFloor = 1;
 	}
 
 	public void run(){
-		
+
 		if(floorList.size()<=0) {
 			try {
 				synchronized(this) {
@@ -65,15 +63,11 @@ public class Elevator extends Thread{
 	/* Signal incoming and outgoing riders */
 	public synchronized void OpenDoors() {
 
-		System.out.println("Doors have opened!");
-		writeLog("E" + elevatorId + " on F" + currentFloor+ "has opened");
-		for(Rider r: riderList) {
-			synchronized(r) {
-				r.notify();
-			}
-		}
-		if(numOn.get(currentFloor)>0 || numOff.get(currentFloor) > 0) {
-			this.safeWait();
+		writeLog("E" + elevatorId + " on F" + currentFloor+ " has opened\n");
+		this.notifyAll();
+		System.out.println("Waiting to get on = "+numGettingOn.get(currentFloor));
+		while(numGettingOn.get(currentFloor)>0 || numGettingOff.get(currentFloor) > 0) {
+			// waiting...
 		}
 		CloseDoors();
 
@@ -84,14 +78,14 @@ public class Elevator extends Thread{
 	}
 
 	public synchronized void addRequest(Rider newRider) {
-		riderList.add(newRider);
 		int floor = newRider.getFrom();
-		int numRidersOn = numOn.get(floor);
-		numOn.set(floor, numRidersOn++);
+		int numRidersOn = numGettingOn.get(floor);
+		numGettingOn.set(floor, ++numRidersOn);
 		if(!floorList.contains(floor)) {
 			floorList.add(floor);
 			Collections.sort(floorList);
 		}
+		this.notifyAll();
 	}
 
 	private int getNextFloor() {
@@ -110,8 +104,8 @@ public class Elevator extends Thread{
 	 * @throws InterruptedException 
 	 */
 	public synchronized void CloseDoors() {
-		System.out.println("Doors have closed!");
-		writeLog("E" + elevatorId + " on F" + currentFloor+ "has closed");
+
+		writeLog("E" + elevatorId + " on F" + currentFloor+ " has closed\n");
 		if(floorList.size()<=0) {
 			try {
 				inTransit = false;
@@ -130,18 +124,20 @@ public class Elevator extends Thread{
 		String direction;
 		int printfloor = currentFloor;
 		if(floor>currentFloor){
+			printfloor++;
 			goingUp = true;
 			direction = "up";
 			while(printfloor<=floor){
-				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor);
+				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor + "\n");
 				printfloor++;
 			}
 		}
 		else {
+			printfloor--;
 			goingUp = false;
 			direction = "down";
 			while(printfloor>=floor){
-				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor);
+				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor + "\n");
 				printfloor--;
 			}
 		}
@@ -159,20 +155,19 @@ public class Elevator extends Thread{
 
 	/* Enter the elevator */
 	public synchronized boolean Enter(int floor) {
-
+		System.out.println("ENTER WAS CALLED!");
 		if(ridersOn==maxOccupancyThreshold) {
-			numOn.set(currentFloor, 0);
+			numGettingOn.set(currentFloor, 0);
 			CloseDoors();
 			return false;
 		}
 		else {
 			ridersOn++;
-			System.out.println("Set = "+ currentFloor + " numOn size = "+numOn.size());
-			numOn.set(currentFloor, (numOn.get(currentFloor)-1));
+			numGettingOn.set(currentFloor, (numGettingOn.get(currentFloor)-1));
 
 			RequestFloor(floor);
 		}
-		if(numOff.get(currentFloor)==0 && numOn.get(currentFloor) ==0) {
+		if(numGettingOff.get(currentFloor)==0 && numGettingOn.get(currentFloor) == 0) {
 			this.notify();
 		}
 		return true;
@@ -188,8 +183,8 @@ public class Elevator extends Thread{
 
 	/* Exit the elevator */
 	public synchronized int Exit() {
-		numOff.set(currentFloor, numOff.get(currentFloor-1));
-		if(numOff.get(currentFloor)==0 && numOn.get(currentFloor) ==0) {
+		numGettingOff.set(currentFloor, numGettingOff.get(currentFloor-1));
+		if(numGettingOff.get(currentFloor)==0 && numGettingOn.get(currentFloor) ==0) {
 			this.notify();
 		}
 		System.out.println("Rider has left the elevator!");
@@ -198,8 +193,8 @@ public class Elevator extends Thread{
 
 	/* Request a destination floor once you enter */
 	public synchronized void RequestFloor(int floor) {
-		int numRidersOff = numOff.get(floor);
-		numOff.set(floor, numRidersOff++);
+		int numRidersOff = numGettingOff.get(floor);
+		numGettingOff.set(floor, numRidersOff++);
 		if(!floorList.contains(floor)) {
 			floorList.add(floor);
 		}
@@ -230,12 +225,12 @@ public class Elevator extends Thread{
 		}
 	} 
 
-	private void safeWait(){
-		try {
-			this.wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+//	private void safeWait(){
+//		try {
+//			this.wait();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 }

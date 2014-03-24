@@ -31,16 +31,16 @@ public class Rider extends Thread{
 
 	@Override
 	public synchronized void run(){
-		
+
 		if(myRequests.isEmpty()){
 			System.out.println("Rider "+id+" has finished!");
 			return;
 		}
-		
+
 		Request next = myRequests.remove();
 		this.setStartDest(next.getFrom(),next.getTo());
 
-		System.out.println("Running: id = "+id);
+		//System.out.println("Running: id = "+id);
 
 		Elevator e;
 		if(to > from){
@@ -51,14 +51,22 @@ public class Rider extends Thread{
 			this.writeLog("R"+id+" pushes "+"D"+from+"\n");
 			e = building.callDown(this);
 		}
-		
-		System.out.println("Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
 
-		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
-			this.safeWait();
+		System.out.println("****** Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
+
+		while(e.getFloor() != from){// || e.isGoingUp() != (to > from)){
+			System.out.println("////////// I'd like to be notified...");
+			try {
+				synchronized(e){
+					e.wait();
+					System.out.println("/////////// I've been notified!");
+				}
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 		}
 
-		System.out.println("Rider "+id+" is about to call Enter!");
+		System.out.println("***** Rider "+id+" is about to call Enter!");
 
 		if(!e.Enter(from)){
 			this.run();
@@ -68,7 +76,13 @@ public class Rider extends Thread{
 		}
 
 		while(e.getFloor() != to){
-			this.safeWait();
+			try {
+				synchronized(e){
+					e.wait();
+				}
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		int floorExited = e.Exit();
@@ -107,12 +121,12 @@ public class Rider extends Thread{
 		}
 	} 
 
-	public synchronized void safeWait(){
-		try {
-			this.wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+	//	public synchronized void safeWait(){
+	//		try {
+	//			this.wait();
+	//		} catch (InterruptedException e) {
+	//			e.printStackTrace();
+	//		}
+	//	}
 
 }
