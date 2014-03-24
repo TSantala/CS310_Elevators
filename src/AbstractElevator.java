@@ -16,7 +16,7 @@ public abstract class AbstractElevator {
 	}
 
 	/**
-	 * Elevator control inferface: invoked by Elevator thread.
+	 * Elevator control interface: invoked by Elevator thread.
 	 */
 
 	/* Signal incoming and outgoing riders */
@@ -26,7 +26,7 @@ public abstract class AbstractElevator {
 	 * When capacity is reached or the outgoing riders are exited and
 	 * incoming riders are in. 
 	 */
-	public abstract void ClosedDoors();
+	public abstract void CloseDoors();
 
 	/* Go to a requested floor */
 	public abstract void VisitFloor(int floor);

@@ -7,7 +7,7 @@ public class Building {
 	
 	public Building(int f){
 		numFloors = f;
-		elevator = new Elevator(0,0,0);
+		elevator = new Elevator(numFloors,0,0);
 		barrier = new EventBarrier();
 	}
 	

@@ -21,7 +21,6 @@ public class Rider extends Thread{
 		System.out.println("Elevator has been assigned to this rider! = "+id);
 		
 		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
-
 			try {
 				this.wait();
 			} catch (InterruptedException e1) {
