@@ -57,5 +57,11 @@ public class Building {
 	public Elevator callDown(Rider r){
 		return elevator;
 	}
+	
+	public void writeLog(String message) throws IOException {
+		synchronized(logfile) {
+			logfile.write(message);
+		}
+	} 
 
 }

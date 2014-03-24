@@ -61,5 +61,11 @@ public class Rider extends Thread{
 	public int getTo(){
 		return to;
 	}
+	
+	public void writeLog(String message) throws IOException {
+		synchronized(logfile) {
+			logfile.write(message);
+		}
+	} 
 
 }
