@@ -58,6 +58,7 @@ public class Building {
 	}
 	
 	public void startRiders(){
+		System.out.println("*** Riders started!");
 		for(Rider r : riders)
 			r.start();
 	}
