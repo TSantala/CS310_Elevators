@@ -55,11 +55,33 @@ public class Building {
 	
 
 	public Elevator callUp(Rider r){
-		return elevators[0];
+		int startFloor = r.getFrom();
+		while(true) {
+			for(int i = 0; i < elevators.length; i++) {
+				Elevator e = elevators[i];
+				if(!e.isInTransit()) {
+					return e;
+				}
+				else if(e.isGoingUp() && e.getFloor()<startFloor) {
+					return e;
+				}
+			}
+		}
 	}
 	
 	public Elevator callDown(Rider r){
-		return elevators[0];
+		int startFloor = r.getFrom();
+		while(true) {
+			for(int i = 0; i < elevators.length; i++) {
+				Elevator e = elevators[i];
+				if(!e.isInTransit()) {
+					return e;
+				}
+				else if(!e.isGoingUp() && e.getFloor()>startFloor) {
+					return e;
+				}
+			}
+		}
 	}
 	
 	public void writeLog(String message) throws IOException {
