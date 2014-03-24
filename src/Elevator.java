@@ -18,7 +18,7 @@ public class Elevator extends Thread{
 	private boolean goingUp;
 	private int ridersOn;
 	private BufferedWriter logfile;
-	
+
 
 	public Elevator(int numFloors, int elevatorId, int maxOccupancyThreshold, BufferedWriter log) {
 		this.numFloors = numFloors;
@@ -42,15 +42,8 @@ public class Elevator extends Thread{
 					e.printStackTrace();
 				}
 			}
-			try {
-				VisitFloor(getNextFloor());
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			VisitFloor(getNextFloor());
+
 	}
 
 	/**
@@ -60,8 +53,8 @@ public class Elevator extends Thread{
 	 */
 
 	/* Signal incoming and outgoing riders */
-	public synchronized void OpenDoors() throws InterruptedException, IOException {
-		
+	public synchronized void OpenDoors() {
+
 		System.out.println("Doors have opened!");
 		writeLog("E" + elevatorId + " on F" + currentFloor+ "has opened");
 		for(Rider r: riderList) {
@@ -69,19 +62,17 @@ public class Elevator extends Thread{
 				r.notify();
 			}
 		}
-		synchronized(this) {
-			if(numOn.get(currentFloor)>0 || numOff.get(currentFloor) > 0) {
-				this.wait();
-			}
+		if(numOn.get(currentFloor)>0 || numOff.get(currentFloor) > 0) {
+			this.safeWait();
 		}
 		CloseDoors();
 
 	}
-	
+
 	public synchronized boolean isGoingUp() {
 		return goingUp;
 	}
-	
+
 	public synchronized void addRequest(Rider newRider) {
 		riderList.add(newRider);
 		int floor = newRider.getFrom();
@@ -92,7 +83,7 @@ public class Elevator extends Thread{
 			Collections.sort(floorList);
 		}
 	}
-	
+
 	private int getNextFloor() {
 		if(goingUp) {
 			return floorList.remove(0);
@@ -108,19 +99,34 @@ public class Elevator extends Thread{
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public synchronized void CloseDoors() throws IOException, InterruptedException {
+	public synchronized void CloseDoors() {
 		System.out.println("Doors have closed!");
 		writeLog("E" + elevatorId + " on F" + currentFloor+ "has closed");
 		if(floorList.size()<=0) {
-			this.wait();
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		VisitFloor(getNextFloor());
 	}
 
 	/* Go to a requested floor */
-	public synchronized void VisitFloor(int floor) throws InterruptedException, IOException {
+	public synchronized void VisitFloor(int floor) {
+		String direction;
+		if(floor>currentFloor){
+			goingUp = true;
+			direction = "up";
+		}
+		else {
+			goingUp = false;
+			direction = "down";
+		}
 		currentFloor = floor;
 		System.out.println("Now visiting floor: "+currentFloor);
+		writeLog("E" + elevatorId + " moves " + direction + " to F" + currentFloor);
 		this.OpenDoors();
 	}
 
@@ -132,8 +138,8 @@ public class Elevator extends Thread{
 	 */
 
 	/* Enter the elevator */
-	public synchronized boolean Enter() throws IOException, InterruptedException {
-		
+	public synchronized boolean Enter() {
+
 		if(ridersOn==maxOccupancyThreshold) {
 			numOn.set(currentFloor, 0);
 			CloseDoors();
@@ -180,11 +186,23 @@ public class Elevator extends Thread{
 	public synchronized int getFloor(){
 		return currentFloor;
 	}
-	
-	public void writeLog(String message) throws IOException {
+
+	public void writeLog(String message) {
 		synchronized(logfile) {
-			logfile.write(message);
+			try {
+				logfile.write(message);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-	} 
+	}
+
+	private void safeWait(){
+		try {
+			this.wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
