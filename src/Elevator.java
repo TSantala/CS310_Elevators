@@ -55,7 +55,7 @@ public class Elevator extends Thread{
 	}
 
 	/**
-	 * Elevator control inferface: invoked by Elevator thread.
+	 * Elevator control interface: invoked by Elevator thread.
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
@@ -65,7 +65,7 @@ public class Elevator extends Thread{
 
 		writeLog("E" + elevatorId + " on F" + currentFloor+ " has opened\n");
 		this.notifyAll();
-		System.out.println("Waiting to get on = "+numGettingOn.get(currentFloor));
+		System.out.println("****** Waiting to get on = "+numGettingOn.get(currentFloor));
 		while(numGettingOn.get(currentFloor)>0 || numGettingOff.get(currentFloor) > 0) {
 			// waiting...
 		}
