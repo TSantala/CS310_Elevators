@@ -65,7 +65,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		System.out.println("Simulation complete!");
+		System.out.println("Simulation complete!\n");
 
 		bw.write("Simulation Complete");
 		bw.close();
