@@ -18,6 +18,7 @@ public class Elevator extends Thread{
 	private boolean goingUp;
 	private int ridersOn;
 	private BufferedWriter logfile;
+	private boolean inTransit;
 
 
 	public Elevator(int numFloors, int elevatorId, int maxOccupancyThreshold, BufferedWriter log) {
@@ -29,13 +30,16 @@ public class Elevator extends Thread{
 		logfile = log;
 		this.numOn = new ArrayList<Integer>(numFloors+1);
 		this.numOff = new ArrayList<Integer>(numFloors+1);
+		inTransit = false;
 	}
 	
 	public void run(){
 			if(floorList.size()<=0) {
 				try {
 					synchronized(this) {
+						inTransit = false;
 						this.wait();
+						inTransit = true;
 					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -104,7 +108,9 @@ public class Elevator extends Thread{
 		writeLog("E" + elevatorId + " on F" + currentFloor+ "has closed");
 		if(floorList.size()<=0) {
 			try {
+				inTransit = false;
 				this.wait();
+				inTransit = true;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -186,9 +192,13 @@ public class Elevator extends Thread{
 	public synchronized int getFloor(){
 		return currentFloor;
 	}
-	
+
 	public synchronized int getID(){
 		return elevatorId;
+	}
+
+	public synchronized boolean isInTransit() {
+		return inTransit;
 	}
 
 	public void writeLog(String message) {

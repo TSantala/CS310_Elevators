@@ -32,17 +32,17 @@ public class Building {
 		
 		elevators = new Elevator[numElevators];
 		System.out.println("Elevator array initialized");
-		
+
 		for(int i = 0; i < numElevators; i++) {
 			System.out.println("preerror" + numElevators + "\n");
 			e = new Elevator(numFloors,i+1,capacity, logfile);
-			logfile.write("New Elevator added!");
+			logfile.write("New Elevator added!\n");
 			System.out.println("New elevator added!");
 			e.start();
 			elevators[i] = e;
 		}
 		System.out.println("Created elevators!");
-		
+
 		riders = new Rider[numRiders];
 		for(int j = 0; j < numRiders; j++) {
 			r = new Rider(this, j+1, logfile); 
@@ -63,11 +63,33 @@ public class Building {
 	}
 
 	public Elevator callUp(Rider r){
-		return elevators[0];
+		int startFloor = r.getFrom();
+		while(true) {
+			for(int i = 0; i < elevators.length; i++) {
+				Elevator e = elevators[i];
+				if(!e.isInTransit()) {
+					return e;
+				}
+				else if(e.isGoingUp() && e.getFloor()<startFloor) {
+					return e;
+				}
+			}
+		}
 	}
 
 	public Elevator callDown(Rider r){
-		return elevators[0];
+		int startFloor = r.getFrom();
+		while(true) {
+			for(int i = 0; i < elevators.length; i++) {
+				Elevator e = elevators[i];
+				if(!e.isInTransit()) {
+					return e;
+				}
+				else if(!e.isGoingUp() && e.getFloor()>startFloor) {
+					return e;
+				}
+			}
+		}
 	}
 
 	public void writeLog(String message) throws IOException {
