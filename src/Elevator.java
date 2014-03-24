@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.io.*;
 
 
 public class Elevator extends Thread{
@@ -16,14 +17,16 @@ public class Elevator extends Thread{
 	private int currentFloor;
 	private boolean goingUp;
 	private int ridersOn;
+	private BufferedWriter logfile;
 	
 
-	public Elevator(int numFloors, int elevatorId, int maxOccupancyThreshold) {
+	public Elevator(int numFloors, int elevatorId, int maxOccupancyThreshold, BufferedWriter log) {
 		this.numFloors = numFloors;
 		this.elevatorId = elevatorId;
 		this.maxOccupancyThreshold = maxOccupancyThreshold;
 		this.riderList = new ArrayList<Rider>();
 		this.floorList = new ArrayList<Integer>();
+		logfile = log;
 		this.numOn = new ArrayList<Integer>(numFloors+1);
 		this.numOff = new ArrayList<Integer>(numFloors+1);
 	}

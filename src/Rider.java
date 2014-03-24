@@ -1,16 +1,29 @@
-
+import java.io.*;
 public class Rider extends Thread{
 	
 	private Building building;
 	private int from;
 	private int to;
 	private int id;
+	private BufferedWriter logfile;
 	
-	public Rider(int floorFrom, int floorTo, Building b, int i){
+	public Rider(int floorFrom, int floorTo, Building b, int i, BufferedWriter log){
 		building = b;
 		from = floorFrom;
 		to = floorTo;
 		id = i;
+		logfile = log;
+	}
+	
+	public Rider(Building b, int i, BufferedWriter log) {
+		building = b;
+		id = i;
+		logfile = log;
+	}
+	
+	public void setStartDest(int start, int dest) {
+		from = start;
+		to = dest;
 	}
 	
 	@Override
