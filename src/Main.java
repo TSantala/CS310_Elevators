@@ -65,6 +65,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
+		// Going to want to move this to building, once we actually know we're done.
 		System.out.println("Simulation complete!\n");
 
 		bw.write("Simulation Complete");
