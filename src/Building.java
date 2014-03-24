@@ -68,9 +68,12 @@ public class Building {
 			for(int i = 0; i < elevators.length; i++) {
 				Elevator e = elevators[i];
 				if(!e.isInTransit()) {
+					e.notify();
+					e.addRequest(r);
 					return e;
 				}
 				else if(e.isGoingUp() && e.getFloor()<startFloor) {
+					e.addRequest(r);
 					return e;
 				}
 			}
@@ -83,9 +86,12 @@ public class Building {
 			for(int i = 0; i < elevators.length; i++) {
 				Elevator e = elevators[i];
 				if(!e.isInTransit()) {
+					e.notify();
+					e.addRequest(r);
 					return e;
 				}
 				else if(!e.isGoingUp() && e.getFloor()>startFloor) {
+					e.addRequest(r);
 					return e;
 				}
 			}

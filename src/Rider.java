@@ -32,7 +32,10 @@ public class Rider extends Thread{
 	@Override
 	public synchronized void run(){
 		
-		if(myRequests.isEmpty()) return;
+		if(myRequests.isEmpty()){
+			System.out.println("Rider "+id+" has finished!");
+			return;
+		}
 		
 		Request next = myRequests.remove();
 		this.setStartDest(next.getFrom(),next.getTo());
@@ -77,11 +80,7 @@ public class Rider extends Thread{
 			e1.printStackTrace();
 		}
 
-		if(!myRequests.isEmpty()){
-			this.run();
-		}
-
-		System.out.println("Rider "+id+" has finished!");
+		this.run();
 
 	}
 
@@ -108,7 +107,7 @@ public class Rider extends Thread{
 		}
 	} 
 
-	public void safeWait(){
+	public synchronized void safeWait(){
 		try {
 			this.wait();
 		} catch (InterruptedException e) {

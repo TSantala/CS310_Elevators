@@ -37,21 +37,22 @@ public class Elevator extends Thread{
 		inTransit = false;
 		currentFloor = 1;
 	}
-	
+
 	public void run(){
-			if(floorList.size()<=0) {
-				try {
-					synchronized(this) {
-						inTransit = false;
-						this.wait();
-						inTransit = true;
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		
+		if(floorList.size()<=0) {
+			try {
+				synchronized(this) {
+					inTransit = false;
+					this.wait();
+					System.out.println("******* Now in transit!");
+					inTransit = true;
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			VisitFloor(getNextFloor());
+		}
+		VisitFloor(getNextFloor());
 
 	}
 
@@ -144,7 +145,7 @@ public class Elevator extends Thread{
 				printfloor--;
 			}
 		}
-		
+
 		currentFloor = floor;
 		this.OpenDoors();
 	}
@@ -168,7 +169,7 @@ public class Elevator extends Thread{
 			ridersOn++;
 			System.out.println("Set = "+ currentFloor + " numOn size = "+numOn.size());
 			numOn.set(currentFloor, (numOn.get(currentFloor)-1));
-			
+
 			RequestFloor(floor);
 		}
 		if(numOff.get(currentFloor)==0 && numOn.get(currentFloor) ==0) {
