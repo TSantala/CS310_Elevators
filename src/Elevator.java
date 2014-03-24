@@ -149,7 +149,7 @@ public class Elevator extends Thread{
 	 */
 
 	/* Enter the elevator */
-	public synchronized boolean Enter() {
+	public synchronized boolean Enter(int floor) {
 
 		if(ridersOn==maxOccupancyThreshold) {
 			numOn.set(currentFloor, 0);
@@ -160,6 +160,7 @@ public class Elevator extends Thread{
 			ridersOn++;
 			System.out.println("Set = "+ currentFloor + " numOn size = "+numOn.size());
 			numOn.set(currentFloor, (numOn.get(currentFloor)-1));
+			RequestFloor(floor);
 		}
 		if(numOff.get(currentFloor)==0 && numOn.get(currentFloor) ==0) {
 			this.notify();
