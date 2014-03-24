@@ -27,17 +27,16 @@ public class Building {
 		Elevator e;
 		Rider r;
 		elevators = new Elevator[numElevators];
-		System.out.println("Elevator array initialized");
+		System.out.println("Elevator array initialized\n");
 		for(int i = 0; i < numElevators; i++) {
 			System.out.println("preerror" + numElevators + "\n");
 			e = new Elevator(numFloors,i+1,capacity, logfile);
-			logfile.write("New Elevator added!");
+			logfile.write("New Elevator added!\n");
 			System.out.println("New elevator added!");
 			e.start();
 			elevators[i] = e;
 		}
 		System.out.println("Created elevators!");
-		logfile.close();
 		riders = new Rider[numRiders];
 		for(int j = 0; j < numRiders; j++) {
 			r = new Rider(this, j+1, logfile); 
