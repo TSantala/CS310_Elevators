@@ -185,12 +185,13 @@ public class Elevator extends Thread{
 	}
 
 	/* Exit the elevator */
-	public synchronized void Exit() {
+	public synchronized int Exit() {
 		numOff.set(currentFloor, numOff.get(currentFloor-1));
 		if(numOff.get(currentFloor)==0 && numOn.get(currentFloor) ==0) {
 			this.notify();
 		}
 		System.out.println("Rider has left the elevator!");
+		return currentFloor;
 	}
 
 	/* Request a destination floor once you enter */
@@ -217,6 +218,7 @@ public class Elevator extends Thread{
 	}
 
 	public void writeLog(String message) {
+		System.out.println(message);
 		synchronized(logfile) {
 			try {
 				logfile.write(message);
@@ -224,7 +226,7 @@ public class Elevator extends Thread{
 				e.printStackTrace();
 			}
 		}
-	}
+	} 
 
 	private void safeWait(){
 		try {

@@ -34,7 +34,15 @@ public class Rider extends Thread{
 
 		System.out.println("Running: id = "+id);
 
-		Elevator e = (to > from) ? building.callUp(this) : building.callDown(this);
+		Elevator e;
+		if(to > from){
+			this.writeLog("R"+id+" pushes "+"U"+from+"\n");
+			e =	building.callUp(this);
+		}
+		else {
+			this.writeLog("R"+id+" pushes "+"D"+from+"\n");
+			e = building.callDown(this);
+		}
 		System.out.println("Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
 
 		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
@@ -43,13 +51,19 @@ public class Rider extends Thread{
 
 		System.out.println("Rider "+id+" is about to call Enter!");
 
-		e.Enter(to);
+		if(!e.Enter(from)){
+			this.run();
+		}
+		else{
+			this.writeLog("R"+id+" enters "+"E"+e.getID()+" on "+from+"\n");
+		}
 
 		while(e.getFloor() != to){
 			this.safeWait();
 		}
 
-		e.Exit();
+		int floorExited = e.Exit();
+		this.writeLog("R"+id+" exits "+"E"+e.getID()+"on F"+floorExited+"\n");
 
 		try {
 			Thread.sleep(100);
@@ -79,9 +93,14 @@ public class Rider extends Thread{
 		myRequests.add(r);
 	}
 
-	public void writeLog(String message) throws IOException {
+	public void writeLog(String message) {
+		System.out.println(message);
 		synchronized(logfile) {
-			logfile.write(message);
+			try {
+				logfile.write(message);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	} 
 
