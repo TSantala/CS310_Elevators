@@ -31,29 +31,26 @@ public class Elevator extends Thread{
 		this.numOff = new ArrayList<Integer>(numFloors+1);
 	}
 	
-	public synchronized void run(){
-		while(1==1) {
+	public void run(){
 			if(floorList.size()<=0) {
 				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				continue;
-			}
-			else {
-				try {
-					VisitFloor(getNextFloor());
+					synchronized(this) {
+						this.wait();
+					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-				
 			}
-		}
+			try {
+				VisitFloor(getNextFloor());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 	/**
@@ -114,6 +111,9 @@ public class Elevator extends Thread{
 	public synchronized void CloseDoors() throws IOException, InterruptedException {
 		System.out.println("Doors have closed!");
 		writeLog("E" + elevatorId + " on F" + currentFloor+ "has closed");
+		if(floorList.size()<=0) {
+			this.wait();
+		}
 		VisitFloor(getNextFloor());
 	}
 
