@@ -135,9 +135,14 @@ public class Elevator extends Thread{
 			goingUp = false;
 			direction = "down";
 		}
-		currentFloor = floor;
+		
 		System.out.println("Now visiting floor: "+currentFloor);
-		writeLog("E" + elevatorId + " moves " + direction + " to F" + currentFloor);
+		int printfloor = currentFloor;
+		while(printfloor<=floor){
+			writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor);
+			printfloor++;
+		}
+		currentFloor = floor;
 		this.OpenDoors();
 	}
 
