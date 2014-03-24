@@ -38,6 +38,7 @@ public class Building {
 		}
 		System.out.println("Created elevators!");
 		logfile.close();
+		riders = new Rider[numRiders];
 		for(int j = 0; j < numRiders; j++) {
 			r = new Rider(this, j+1, logfile); 
 			riders[j] = r;
