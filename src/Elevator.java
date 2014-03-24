@@ -28,9 +28,14 @@ public class Elevator extends Thread{
 		this.riderList = new ArrayList<Rider>();
 		this.floorList = new ArrayList<Integer>();
 		logfile = log;
-		this.numOn = new ArrayList<Integer>(numFloors+1);
-		this.numOff = new ArrayList<Integer>(numFloors+1);
+		this.numOn = new ArrayList<Integer>();
+		this.numOff = new ArrayList<Integer>();
+		for(int i = 0; i <= numFloors+1; i++){
+			numOn.add(0);
+			numOff.add(0);
+		}
 		inTransit = false;
+		currentFloor = 1;
 	}
 	
 	public void run(){
@@ -153,6 +158,7 @@ public class Elevator extends Thread{
 		}
 		else {
 			ridersOn++;
+			System.out.println("Set = "+ currentFloor + " numOn size = "+numOn.size());
 			numOn.set(currentFloor, (numOn.get(currentFloor)-1));
 		}
 		if(numOff.get(currentFloor)==0 && numOn.get(currentFloor) ==0) {
