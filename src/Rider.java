@@ -34,22 +34,14 @@ public class Rider extends Thread{
 		System.out.println("Elevator has been assigned to this rider! = "+id);
 		
 		while(e.getFloor() != from || e.isGoingUp() != (to > from)){
-			try {
-				this.wait();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+			this.safeWait();
 		}
 		
 		e.Enter();
 		e.RequestFloor(to);
 
 		while(e.getFloor() != to){
-			try {
-				this.wait();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+			this.safeWait();
 		}
 		e.Exit();
 	}
@@ -67,5 +59,13 @@ public class Rider extends Thread{
 			logfile.write(message);
 		}
 	} 
+	
+	public void safeWait(){
+		try {
+			this.wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

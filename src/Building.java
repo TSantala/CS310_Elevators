@@ -5,8 +5,8 @@ public class Building {
 	private int numFloors;
 	private Rider[] riders;
 	private Elevator[] elevators;
-	private Elevator elevator;
-	private EventBarrier barrier;
+	//private Elevator elevator;
+	//private EventBarrier barrier;
 	private int numRiders;
 	private int numElevators;
 	private int capacity;
@@ -20,44 +20,46 @@ public class Building {
 		capacity = n;
 		logfile = log;
 
-		barrier = new EventBarrier();
+		//barrier = new EventBarrier();
 	}
 	
 	public void init() throws IOException {
 		Elevator e;
 		Rider r;
 		elevators = new Elevator[numElevators];
+		System.out.println("Elevator array initialized");
 		for(int i = 0; i < numElevators; i++) {
 			System.out.println("preerror" + numElevators + "\n");
 			e = new Elevator(numFloors,i+1,capacity, logfile);
 			logfile.write("New Elevator added!");
+			System.out.println("New elevator added!");
 			e.start();
 			elevators[i] = e;
 		}
-		//logfile.close();
-		riders = new Rider[numRiders];
+		System.out.println("Created elevators!");
+		logfile.close();
 		for(int j = 0; j < numRiders; j++) {
-			r = new Rider(this, j+1, logfile);
-			//r.start(); //the function here is going to change. needs to start running and then wait for movement commands issued by the building 
+			r = new Rider(this, j+1, logfile); 
 			riders[j] = r;
 		}
+		System.out.println("Finished building initialization!");
 	}
 	
 	public void riderInput(int riderNum, int start, int dest) {
-		//if the rider isnt on a journey already
+		//if(start position / request not already set)
 		Rider r = riders[riderNum-1];
 		r.setStartDest(start, dest);
-		
-		
+		r.start(); //the function here is going to change. needs to start running and then wait for movement commands issued by the building
+		//else store request for future.
 	}
 	
 
 	public Elevator callUp(Rider r){
-		return elevator;
+		return elevators[0];
 	}
 	
 	public Elevator callDown(Rider r){
-		return elevator;
+		return elevators[0];
 	}
 	
 	public void writeLog(String message) throws IOException {
