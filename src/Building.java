@@ -28,15 +28,17 @@ public class Building {
 		Rider r;
 		elevators = new Elevator[numElevators];
 		for(int i = 0; i < numElevators; i++) {
+			System.out.println("preerror" + numElevators + "\n");
 			e = new Elevator(numFloors,i+1,capacity, logfile);
 			logfile.write("New Elevator added!");
-			e.run();
+			e.start();
 			elevators[i] = e;
 		}
-		logfile.close();
+		//logfile.close();
+		riders = new Rider[numRiders];
 		for(int j = 0; j < numRiders; j++) {
 			r = new Rider(this, j+1, logfile);
-			r.run(); //the function here is going to change. needs to start running and then wait for movement commands issued by the building 
+			//r.start(); //the function here is going to change. needs to start running and then wait for movement commands issued by the building 
 			riders[j] = r;
 		}
 	}
