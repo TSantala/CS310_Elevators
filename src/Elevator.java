@@ -30,21 +30,20 @@ public class Elevator extends Thread{
 		this.numOn = new ArrayList<Integer>(numFloors+1);
 		this.numOff = new ArrayList<Integer>(numFloors+1);
 	}
-
-	public synchronized void run(){
-		while(true) {
+	
+	public void run(){
 			if(floorList.size()<=0) {
 				try {
-					Thread.sleep(50);
+					synchronized(this) {
+						this.wait();
+					}
 				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				continue;
 			}
-			else {
-				VisitFloor(getNextFloor());
-			}
-		}
+			VisitFloor(getNextFloor());
+
 	}
 
 	/**
@@ -103,12 +102,31 @@ public class Elevator extends Thread{
 	public synchronized void CloseDoors() {
 		System.out.println("Doors have closed!");
 		writeLog("E" + elevatorId + " on F" + currentFloor+ "has closed");
+		if(floorList.size()<=0) {
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		VisitFloor(getNextFloor());
 	}
 
 	/* Go to a requested floor */
 	public synchronized void VisitFloor(int floor) {
+		String direction;
+		if(floor>currentFloor){
+			goingUp = true;
+			direction = "up";
+		}
+		else {
+			goingUp = false;
+			direction = "down";
+		}
+		currentFloor = floor;
 		System.out.println("Now visiting floor: "+currentFloor);
+		writeLog("E" + elevatorId + " moves " + direction + " to F" + currentFloor);
 		this.OpenDoors();
 	}
 

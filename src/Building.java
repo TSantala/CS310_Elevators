@@ -29,6 +29,7 @@ public class Building {
 		elevators = new Elevator[numElevators];
 		System.out.println("Elevator array initialized");
 		for(int i = 0; i < numElevators; i++) {
+			System.out.println("preerror" + numElevators + "\n");
 			e = new Elevator(numFloors,i+1,capacity, logfile);
 			logfile.write("New Elevator added!");
 			System.out.println("New elevator added!");
