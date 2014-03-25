@@ -6,17 +6,13 @@
  * Team Info & Time spent
  *************************/
 
-	Name1: Full Name 	// Edit this accordingly
-	NetId1: fn	 	// Edit
-	Time spent: 10 hours 	// Edit 
+	Name1: Matthew Parides
+	NetId1: mmp37
+	Time spent: 15 hours 
 
-	Name2: Full Name 	// Edit this accordingly
-	NetId2: fn	 	// Edit
-	Time spent: 10 hours 	// Edit 
-
-	Name3: Full Name 	// Edit this accordingly
-	NetId3: fn	 	// Edit
-	Time spent: 10 hours 	// Edit 
+	Name2: Timo Santala 
+	NetId2: tjs40	 
+	Time spent: 15 hours 
 
 /******************
  * Files to submit
@@ -51,7 +47,49 @@
  * In case of lab is limited in some functionality, you should provide the
  * details to maximize your partial credit.  
  * */
-
+ 
+ 1) Our EventBarrier works as per the lab specifications (minstrels arrive and wait if the gate is closed,
+ move through when the gate is open, new minstrels arriving when the gate is open move through immediately).
+ 
+ Testing - to test the eventbarrier, instantiate a Tester object and run runTestPart1();
+ The printout "after arrive before complete id = x" specifies that the consumer has been notified and is
+ moving through the gate. All other printouts should be straightforward.
+ 
+ 2) Our elevator simulator starts by initializing the building/elevators using the first line of the input file.
+ Then, requests are all read in, and controlled by the building from that point. The building will then feed commands
+ to the respective riders who call up/down to the building which it turn selects an elevator to service that request, and sends
+ the appropriate information to the elevator. Elevators are chosen by either being between tasks, or if they are traveling in the
+ direction of the request and the elevator will hit the requesting floor on its current trip. 
+ Once elevators have requests, they unblock from their initial pause, and move to the floor of the first request.
+ If consecutive requests are added, the elevator will stop at any level that asks for a trip, and service these requests
+ fully. Our logic makes any single elevator trip be a straight line, ending with the farthest destination on the path.
+ Riders initialize, get a request, call the elevator, and then wait. The elevator arrives at the floor, opens the doors, and notifies
+ the riders to act. The riders enter the elevator, and once they have all entered (the elevator keeps track of how many
+ people will enter on a given floor), the doors close, the riders wait, and the elevator travels to the next floor. When the elevator
+ arrives, it opens the doors, notifies all associated riders, and the riders pass in and out of the elevator (the elevator also
+ keeps track of how many people need to leave the elevator at a given floor.
+ 
+ Threading - Elevator and Rider are threads. Elevators start and will block if they do not have requests to service. They unblock when
+ the building adds a request. The elevator blocks again when it is out of requests. Riders are initialized, and then block to
+ wait for a trip to fulfill. They unblock when they have a request, and then block again waiting for the elevator doors to open.
+ When the doors open, they unblock, enter the elevator, and then block again to wait for their destination floor. All riders
+ associated with a specific elevator block every time the elevator arrives at a floor. If they unblock and the elevator is not at
+ the correct floor for that rider, the rider reblocks and waits for another notify.
+ 
+ Max Capacity - Our program handles max capacity by scheduling an elevator for a rider normally. If the elevator arrives and
+ it is at max capacity, and nobody is leaving the elevator, the rider will request another elevator to fill its request.
+ 
+ Multiple Elevators - Elevators run independently of eachother, and relatively independent of the building. Elevators
+ keep track of their status as far as if they are currently servicing any requests, and which direction they are heading.
+ Based on this information, the building should route new requests to an elevator that can handle it based on our criteria.
+ Our criteria for an elevator to serve a request are either - 1. The elevator is idle, or 2. The elevator is traveling in the
+ direction that this request wants to go, and the elevator has not yet passed the origin floor of this request. Any elevator
+ fitting these criteria will service any given request, and elevators are chosen by lowest index first in our storage list.
+ 
+ Testing - our program defaults to running on the standardCommands.txt file. It can also take a file as an input, and read from 
+ that file. output is printed in the logfile.txt file.
+ -Our logfile follows the specified output format.
+ 
 /************************
  * Feedback on the lab
  ************************/
@@ -60,6 +98,7 @@
  * Any comments/questions/suggestions/experiences that you would help us to
  * improve the lab.
  * */
+ Fun stuff. I like Turtles.
 
 /************************
  * References
@@ -68,3 +107,4 @@
 /*
  * List of collaborators involved including any online references/citations.
  * */
+
