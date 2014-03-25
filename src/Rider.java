@@ -52,41 +52,39 @@ public class Rider extends Thread{
 			e = building.callDown(this);
 		}
 
-		System.out.println("****** Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
+		System.out.println("******* Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
+		e.getFloor();
+		System.out.println("******* beep again...");
 
-		while(e.getFloor() != from){// || e.isGoingUp() != (to > from)){
-			System.out.println("////////// I'd like to be notified...");
-			try {
-				synchronized(e){
+		synchronized(e){
+			while(e.getFloor() != from){				// || e.isGoingUp() != (to > from)){
+				System.out.println("////////// I'd like to be notified...");
+				try {
 					e.wait();
 					System.out.println("/////////// I've been notified!");
+
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
 			}
 		}
 
-		System.out.println("***** Rider "+id+" is about to call Enter!");
-
-		if(!e.Enter(from)){
+		if(!e.Enter(this)){
+			System.out.println("***** Enter returned false, trying again...");
 			this.run();
 		}
-		else{
-			this.writeLog("R"+id+" enters "+"E"+e.getID()+" on "+from+"\n");
-		}
 
-		while(e.getFloor() != to){
-			try {
-				synchronized(e){
+		synchronized(e){
+			while(e.getFloor() != to){
+				try {
 					e.wait();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
 			}
 		}
 
-		int floorExited = e.Exit();
-		this.writeLog("R"+id+" exits "+"E"+e.getID()+"on F"+floorExited+"\n");
+		e.Exit(this);
 
 		try {
 			Thread.sleep(100);
@@ -105,6 +103,10 @@ public class Rider extends Thread{
 	public int getTo(){
 		return to;
 	}	
+	
+	public int getID(){
+		return id;
+	}
 
 	public void addRequest(Request r) {
 		myRequests.add(r);
