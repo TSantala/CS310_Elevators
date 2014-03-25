@@ -3,7 +3,13 @@ public class Main {
 
 	public static void main(String[] args) throws IOException{
 
-		System.out.println("Started");
+		if(args.length > 0){
+			if(args[0].equals("Part1Test")){
+				new Tester();
+				return;
+			}
+		}
+		
 		String line = null;
 		Building b;
 		String fileName;

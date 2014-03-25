@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.*;
 
 public class Building {
 
@@ -13,8 +12,7 @@ public class Building {
 	private int capacity;
 	private BufferedWriter logfile;
 
-	private List<Request> requests = new ArrayList<Request>();
-
+	private int completedRiders = 0;
 
 	public Building(int f, int e, int r, int n, BufferedWriter log){
 		numFloors = f;
@@ -29,14 +27,12 @@ public class Building {
 	public void init() throws IOException {
 		Elevator e;
 		Rider r;
-		
+
 		elevators = new Elevator[numElevators];
 		System.out.println("Elevator array initialized");
 
 		for(int i = 0; i < numElevators; i++) {
 			e = new Elevator(numFloors,i+1,capacity, logfile);
-			logfile.write("New Elevator added!\n");
-			System.out.println("New elevator added!");
 			e.start();
 			elevators[i] = e;
 		}
@@ -51,29 +47,43 @@ public class Building {
 	}
 
 	public void riderRequestInput(int riderNum, int start, int dest) {
-		Request r = new Request(riderNum, start, dest);
-		requests.add(r);
-		riders[riderNum-1].addRequest(r);
+		riders[riderNum-1].addRequest(new Request(riderNum, start, dest));
 	}
-	
+
 	public void startRiders(){
 		System.out.println("*** Riders started!");
 		for(Rider r : riders)
 			r.start();
 	}
+	
+	public void checkCompletion(){
+		completedRiders++;
+		if(completedRiders == numRiders){
+			this.writeLog("Simulation completed!\n");
+			try {
+				logfile.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			for(Elevator e : elevators){
+				e.interrupt();
+			}
+		}
+	}
 
 	public Elevator callUp(Rider r){
 		int startFloor = r.getFrom();
 		while(true) {
-			for(int i = 0; i < elevators.length; i++) {
-				Elevator e = elevators[i];
-				if(!e.isInTransit()) {
-					e.addRequest(r);
-					return e;
-				}
-				else if(e.isGoingUp() && e.getFloor()<startFloor) {
-					e.addRequest(r);
-					return e;
+			for(Elevator e : elevators) {
+				synchronized(e){
+					if(e.isGoingUp() && e.getFloor()<startFloor) {
+						e.addRequest(r);
+						return e;
+					}
+					else if(!e.isInTransit()) {
+						e.addRequest(r);
+						return e;
+					}
 				}
 			}
 		}
@@ -82,23 +92,30 @@ public class Building {
 	public Elevator callDown(Rider r){
 		int startFloor = r.getFrom();
 		while(true) {
-			for(int i = 0; i < elevators.length; i++) {
-				Elevator e = elevators[i];
-				if(!e.isInTransit()) {
-					e.addRequest(r);
-					return e;
-				}
-				else if(!e.isGoingUp() && e.getFloor()>startFloor) {
-					e.addRequest(r);
-					return e;
+			for(Elevator e : elevators) {
+				synchronized(e){
+					if(!e.isGoingUp() && e.getFloor()>startFloor) {
+						e.addRequest(r);
+						return e;
+					}
+					else if(!e.isInTransit()) {
+						e.addRequest(r);
+						return e;
+					}
 				}
 			}
 		}
 	}
-
-	public void writeLog(String message) throws IOException {
+	
+	public void writeLog(String message) {
+		System.out.print(message);
 		synchronized(logfile) {
-			logfile.write(message);
+			try {
+				logfile.write(message);
+				logfile.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	} 
 

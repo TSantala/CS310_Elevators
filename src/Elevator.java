@@ -18,6 +18,7 @@ public class Elevator extends Thread{
 	private int ridersOn;
 	private BufferedWriter logfile;
 	private boolean inTransit;
+	private boolean isOpen;
 
 
 	public Elevator(int numFloors, int elevatorId, int maxOccupancyThreshold, BufferedWriter log) {
@@ -33,12 +34,14 @@ public class Elevator extends Thread{
 			numGettingOff.add(0);
 		}
 		inTransit = false;
+		isOpen = false;
 		currentFloor = 1;
+		ridersOn = 0;
 	}
 
 	public void run(){
 
-		if(floorList.size()<=0) {
+		if(floorList.size()==0) {
 			try {
 				synchronized(this) {
 					inTransit = false;
@@ -47,7 +50,7 @@ public class Elevator extends Thread{
 					inTransit = true;
 				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				return;
 			}
 		}
 
@@ -55,15 +58,10 @@ public class Elevator extends Thread{
 
 	}
 
-	/**
-	 * Elevator control interface: invoked by Elevator thread.
-	 * @throws InterruptedException 
-	 * @throws IOException 
-	 */
-
+	
 	/* Signal incoming and outgoing riders */
-	public void OpenDoors() {
-
+	public synchronized void OpenDoors() {
+		isOpen = true;
 		writeLog("E" + elevatorId + " on F" + currentFloor+ " has opened\n");
 		synchronized(this){
 			this.notifyAll();
@@ -73,32 +71,17 @@ public class Elevator extends Thread{
 			try {
 				this.wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				return;
 			}
 		}
 		this.CloseDoors();
 	}
 
-	/**
-	 * When capacity is reached or the outgoing riders are exited and
-	 * incoming riders are in. 
-	 * @throws IOException 
-	 * @throws InterruptedException 
-	 */
-	public void CloseDoors() {
 
+	public synchronized void CloseDoors() {
+		isOpen = false;
 		writeLog("E" + elevatorId + " on F" + currentFloor+ " has closed\n");
-		if(floorList.size()<=0) {
-			try {
-				inTransit = false;
-				this.wait();
-				inTransit = true;
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		this.VisitFloor(getNextFloor());
+		this.run();
 	}
 
 	public synchronized boolean isGoingUp() {
@@ -118,55 +101,45 @@ public class Elevator extends Thread{
 
 	private int getNextFloor() {
 		if(goingUp) {
-			return floorList.remove(0);
+			return floorList.get(0);
 		}
 		else {
-			return floorList.remove(floorList.size()-1);
+			return floorList.get(floorList.size()-1);
 		}
 	}
 
 	/* Go to a requested floor */
 	public synchronized void VisitFloor(int floor) {
-		String direction;
-		int printfloor = currentFloor;
 		if(floor>currentFloor){
-			printfloor++;
 			goingUp = true;
-			direction = "up";
-			while(printfloor<=floor){
-				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor + "\n");
-				printfloor++;
+			while(currentFloor<floor){
+				currentFloor++;
+				writeLog("E" + elevatorId + " moves up to F" + currentFloor + "\n");
+				floor = this.getNextFloor();	// In case pick-up on the way.
 			}
 		}
 		else {
-			printfloor--;
 			goingUp = false;
-			direction = "down";
-			while(printfloor>=floor){
-				writeLog("E" + elevatorId + " moves " + direction + " to F" + printfloor + "\n");
-				printfloor--;
+			while(currentFloor>floor){
+				currentFloor--;
+				writeLog("E" + elevatorId + " moves down to F" + currentFloor + "\n");
+				floor = this.getNextFloor();	// In case pick-up on the way.
 			}
 		}
-
 		currentFloor = floor;
+		floorList.remove((Integer) currentFloor);
 		this.OpenDoors();
 	}
 
 
-	/**
-	 * Elevator rider interface (part 1): invoked by rider threads. 
-	 * @throws InterruptedException 
-	 * @throws IOException 
-	 */
 
 	/* Enter the elevator */
 	public synchronized boolean Enter(Rider r) {
-
-		this.writeLog("R"+r.getID()+" enters "+"E"+this.getID()+" on F"+currentFloor+"\n");
-
-		if(ridersOn==maxOccupancyThreshold) {
+		//System.out.println("Start of enter: ridersOn = "+ridersOn+" max occ = "+maxOccupancyThreshold);
+		if(this.atMaxCapacity()) {
 			numGettingOn.set(currentFloor, 0);
-			this.CloseDoors();
+			this.writeLog("At max capacity! R"+r.getID()+" cannot enter.");
+			this.notifyAll();
 			return false;
 		}
 		else {
@@ -179,13 +152,15 @@ public class Elevator extends Thread{
 		if(numGettingOff.get(currentFloor)==0 && numGettingOn.get(currentFloor) == 0) {
 			this.notifyAll();
 		}
+		this.writeLog("R"+r.getID()+" enters "+"E"+this.getID()+" on F"+currentFloor+"\n");
 		return true;
 	}
 
 	/* Exit the elevator */
 	public synchronized void Exit(Rider r) {
 		this.writeLog("R"+r.getID()+" exits "+"E"+this.getID()+" on F"+currentFloor+"\n");
-		numGettingOff.set(currentFloor, numGettingOff.get(currentFloor-1));
+		ridersOn--;
+		numGettingOff.set(currentFloor, numGettingOff.get(currentFloor)-1);
 		if(numGettingOff.get(currentFloor)==0 && numGettingOn.get(currentFloor) ==0) {
 			this.notifyAll();
 		}
@@ -197,6 +172,7 @@ public class Elevator extends Thread{
 		numGettingOff.set(floor, ++numRidersOff);
 		if(!floorList.contains(floor)) {
 			floorList.add(floor);
+			Collections.sort(floorList);
 		}
 	}
 
@@ -213,12 +189,21 @@ public class Elevator extends Thread{
 	public boolean isInTransit() {
 		return inTransit;
 	}
+	
+	public boolean isOpen(){
+		return isOpen;
+	}
+	
+	public boolean atMaxCapacity(){
+		return ridersOn == maxOccupancyThreshold;
+	}
 
 	public void writeLog(String message) {
 		System.out.print(message);
 		synchronized(logfile) {
 			try {
 				logfile.write(message);
+				logfile.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

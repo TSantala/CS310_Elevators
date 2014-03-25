@@ -10,13 +10,8 @@ public class Rider extends Thread{
 	private BufferedWriter logfile;
 	private Queue<Request> myRequests = new LinkedList<Request>();
 
-	public Rider(int floorFrom, int floorTo, Building b, int i, BufferedWriter log){
-		building = b;
-		from = floorFrom;
-		to = floorTo;
-		id = i;
-		logfile = log;
-	}
+	int count = 0;
+
 
 	public Rider(Building b, int i, BufferedWriter log) {
 		building = b;
@@ -33,14 +28,13 @@ public class Rider extends Thread{
 	public synchronized void run(){
 
 		if(myRequests.isEmpty()){
-			System.out.println("Rider "+id+" has finished!");
+			this.writeLog("R"+id+" has finished!\n");
+			building.checkCompletion();
 			return;
 		}
 
 		Request next = myRequests.remove();
 		this.setStartDest(next.getFrom(),next.getTo());
-
-		//System.out.println("Running: id = "+id);
 
 		Elevator e;
 		if(to > from){
@@ -52,35 +46,27 @@ public class Rider extends Thread{
 			e = building.callDown(this);
 		}
 
-		System.out.println("******* Elevator: "+e.getID()+" has been assigned to this rider! Rider ID = "+id);
-		e.getFloor();
-		System.out.println("******* beep again...");
+		this.writeLog("R"+this.getID()+" has been assigned E"+e.getID()+"\n");
 
 		synchronized(e){
-			while(e.getFloor() != from){				// || e.isGoingUp() != (to > from)){
-				System.out.println("////////// I'd like to be notified...");
-				try {
-					e.wait();
-					System.out.println("/////////// I've been notified!");
-
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+			while((e.getFloor() != from) || !e.isOpen()){
+				this.safeWait(e);
 			}
 		}
 
 		if(!e.Enter(this)){
-			System.out.println("***** Enter returned false, trying again...");
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			this.addRequestToFront(new Request(id,from,to));
 			this.run();
 		}
 
 		synchronized(e){
-			while(e.getFloor() != to){
-				try {
-					e.wait();
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+			while(e.getFloor() != to || !e.isOpen()){
+				this.safeWait(e);
 			}
 		}
 
@@ -103,7 +89,7 @@ public class Rider extends Thread{
 	public int getTo(){
 		return to;
 	}	
-	
+
 	public int getID(){
 		return id;
 	}
@@ -112,23 +98,30 @@ public class Rider extends Thread{
 		myRequests.add(r);
 	}
 
+	public void addRequestToFront(Request r) {
+		myRequests.add(r);
+		for(int i = 0; i<myRequests.size()-1; i++)
+			myRequests.add(myRequests.remove());
+	}
+
 	public void writeLog(String message) {
 		System.out.print(message);
 		synchronized(logfile) {
 			try {
 				logfile.write(message);
+				logfile.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	} 
 
-	//	public synchronized void safeWait(){
-	//		try {
-	//			this.wait();
-	//		} catch (InterruptedException e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
+	private void safeWait(Object o){
+		try {
+			o.wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

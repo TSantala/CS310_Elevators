@@ -1,0 +1,62 @@
+R1 pushes U2
+R2 has finished!
+R5 pushes D10
+R3 pushes U3
+R4 has finished!
+R1 has been assigned E1
+E1 moves up to F2
+R5 has been assigned E2
+E1 on F2 has opened
+E2 moves up to F2
+E2 moves up to F3
+R3 has been assigned E1
+E2 moves up to F4
+E2 moves up to F5
+R1 enters E1 on F2
+E2 moves up to F6
+E1 on F2 has closed
+E2 moves up to F7
+E1 moves up to F3
+E2 moves up to F8
+E1 on F3 has opened
+E2 moves up to F9
+E2 moves up to F10
+R3 enters E1 on F3
+E2 on F10 has opened
+E1 on F3 has closed
+E1 moves up to F4
+R5 enters E2 on F10
+E1 on F4 has opened
+E2 on F10 has closed
+E2 moves down to F9
+R3 exits E1 on F4
+E2 moves down to F8
+E1 on F4 has closed
+E2 moves down to F7
+E1 moves up to F5
+E2 moves down to F6
+E1 moves up to F6
+E2 moves down to F5
+E1 on F6 has opened
+E2 moves down to F4
+E2 moves down to F3
+R1 exits E1 on F6
+E2 on F3 has opened
+E1 on F6 has closed
+R5 exits E2 on F3
+E2 on F3 has closed
+R5 has finished!
+R3 has finished!
+R1 pushes D6
+R1 has been assigned E1
+E1 on F6 has opened
+R1 enters E1 on F6
+E1 on F6 has closed
+E1 moves down to F5
+E1 moves down to F4
+E1 moves down to F3
+E1 on F3 has opened
+R1 exits E1 on F3
+E1 on F3 has closed
+R1 has finished!
+Simulation completed!
